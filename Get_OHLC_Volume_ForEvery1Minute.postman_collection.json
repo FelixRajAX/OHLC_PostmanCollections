@@ -1,0 +1,87 @@
+{
+  "info": {
+    "_postman_id": "ec0fcee3-847d-40e0-a051-d79c3ea695d0",
+    "name": "Get_OHLC_Volume_ForEvery1Minute",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "56326463"
+  },
+  "item": [
+    {
+      "name": "Get OHLC Data Every 15 Minutes Copy",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Parse the JSON response",
+              "let respData = pm.response.json();",
+              "",
+              "// Safety check: ensure data exists",
+              "if (respData && respData.data && respData.data.length > 0) {",
+              "    let pkt = respData.data[0];",
+              "",
+              "    // Extract fields",
+              "    let volume = pkt.volume_traded;",
+              "    let ohlc = pkt.ohlc || {};",
+              "",
+              "// Build a CSV line",
+              "    let CurrentTimeStamp = new Date().toISOString();",
+              "    let CurrentCandleValues = `${CurrentTimeStamp},${volume},${ohlc.open},${ohlc.high},${ohlc.low},${ohlc.close}\\n`;",
+              "",
+              "    // Get existing environment variable",
+              "    let existing = pm.environment.get(\"CSV_DATA\");",
+              "",
+              "    // Append new line",
+              "    pm.environment.set(\"CSV_DATA\", existing + CurrentCandleValues);",
+              "    console.log(\"CSV Data Captured : \" + pm.environment.get(\"CSV_DATA\"))",
+              "",
+              "} else {",
+              "    console.log(\"No data found in response\");",
+              "}",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-jwt-token",
+            "value": "{{JWT-TOKEN}}"
+          }
+        ],
+        "url": {
+          "raw": "https://developer.paytmmoney.com/data/v1/price/live?mode=FULL&pref=NSE:40:EQUITY",
+          "protocol": "https",
+          "host": [
+            "developer",
+            "paytmmoney",
+            "com"
+          ],
+          "path": [
+            "data",
+            "v1",
+            "price",
+            "live"
+          ],
+          "query": [
+            {
+              "key": "mode",
+              "value": "FULL"
+            },
+            {
+              "key": "pref",
+              "value": "NSE:40:EQUITY"
+            }
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request GET 'https://developer.paytmmoney.com/data/v1/price/live?mode={MODE_TYPE}&pref={PREFERENCES}' \\\r\n--header 'x-jwt-token: {YOUR_JWT_TOKEN}'\r\n\r\n \r\n"
+      },
+      "response": []
+    }
+  ]
+}
